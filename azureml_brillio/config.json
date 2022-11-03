@@ -1,5 +1,5 @@
 {
     "subscription_id": "a4df42c9-c1d2-44c4-b2c2-05edb4b27aad",
     "resource_group": "RG-MSFT-ML-POC-01",
-    "workspace_name": "aml-msft-ml-poc1"
+    "workspace_name": "Azureml-SDK-brillio"
 }

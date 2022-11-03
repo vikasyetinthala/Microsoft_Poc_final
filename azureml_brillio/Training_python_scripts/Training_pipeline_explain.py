@@ -5,6 +5,7 @@ import os
 import argparse
 import joblib
 import json
+from azureml.interpret import ExplanationClient 
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--datafolder",type=str)
@@ -35,7 +36,18 @@ y_prob=lr.predict_proba(x_test)[:,1]
 from sklearn.metrics import confusion_matrix
 cm=confusion_matrix(y_test,pred)
 score=lr.score(x_test,y_test)
-
+from interpret_community.tabular_explainer import TabularExplainer
+classes=[0,1]
+features = list(x.columns)
+tab_explainer = TabularExplainer(trained_model,
+                                x_train,
+                                features=features,
+                                classes=classes)
+global_explanation= tab_explainer.explain_global(x_train)
+global_fi = global_explanation.get_feature_importance_dict()
+from azureml.interpret import ExplanationClient 
+explain_client= ExplanationClient.from_run(new_run)
+explain_client.upload_model_explanation(global_explanation,comment="My First Explanation")
 
 
 '''
