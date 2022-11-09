@@ -3,14 +3,17 @@ import joblib
 import json
 import numpy as np
 import pandas as pd
-from pyspark.sql import SparkSession
 
 new_run= Run.get_context()
-spark= SparkSession.builder.getOrCreate()
+#spark= SparkSession.builder.getOrCreate()
 ws=new_run.experiment.workspace 
-az_dataset = Dataset.get_by_name(ws,"Titanic_selected_columns")
+#az_dataset = Dataset.get_by_name(ws,"Titanic_selected_columns")
+az_dataset = Dataset.get_by_name(ws,"Titanic_vikas_logging")
 
 df = az_dataset.to_pandas_dataframe()
+df=df[["Pclass","Sex","Age","SibSp","Parch","Fare","Embarked","Survived"]]
+
+#df = az_dataset.to_pandas_dataframe()
 df["Age"]=df["Age"].fillna(np.mean(df["Age"]))
 df["Embarked"]=df["Embarked"].fillna(df["Embarked"].value_counts(ascending=False).index[0])
 df=pd.get_dummies(df)
