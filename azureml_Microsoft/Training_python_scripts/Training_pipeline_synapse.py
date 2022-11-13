@@ -1,0 +1,75 @@
+from azureml.core import Run, Experiment, Workspace, Dataset, Datastore
+import pandas as pd 
+import numpy as np
+import os 
+import argparse
+import joblib
+import json
+
+parser=argparse.ArgumentParser()
+parser.add_argument("--datafolder",type=str)
+args= parser.parse_args() 
+new_run=Run.get_context() 
+ws=new_run.experiment.workspace 
+
+az_dataset = Dataset.get_by_name(ws,"azureml_processed_dataset_synapse")
+
+dataprep = az_dataset.to_pandas_dataframe()
+
+x=dataprep.drop(['Survived'],axis=1)
+#y=dataprep["Survived"]
+y=pd.DataFrame(dataprep["Survived"],columns=["Survived"])
+train_enc_cols= x.columns
+
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.25,random_state=123)
+
+from sklearn.linear_model import LogisticRegression
+lr=LogisticRegression()
+trained_model=lr.fit(x_train,y_train)
+
+pred=lr.predict(x_test)
+
+y_prob=lr.predict_proba(x_test)[:,1]
+
+from sklearn.metrics import confusion_matrix
+cm=confusion_matrix(y_test,pred)
+score=lr.score(x_test,y_test)
+
+
+
+'''
+cm_dict={"schema_type":"confusion_matrix",
+        "schema_version":"v1",
+        "data":{"class_labels":[0,1],
+        "matrix":cm.tolist()}
+        }
+
+new_run.log_confusion_matrix("ConfusionMatrix",cm_dict)'''
+new_run.log("score ",score)
+'''
+x_test=x_test.reset_index(drop=True)
+y_test=y_test.reset_index(drop=True)
+y_prob_df=pd.DataFrame(y_prob,columns=["Scored Probabilities"])
+y_predict_df=pd.DataFrame(pred,columns="Scored_Label")
+scored_dataset=pd.concat([x_test,y_test,y_prob_df,y_predict_df],axis=1)
+
+scored_dataset.to_csv("./outputs/defaults_scored.csv")'''
+#model_file='./outputs/models.pkl'
+#joblib.dump(value=[train_enc_cols,trained_model],filename=model_file)
+new_run.complete()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

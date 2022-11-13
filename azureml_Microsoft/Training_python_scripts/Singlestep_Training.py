@@ -8,7 +8,7 @@ new_run= Run.get_context()
 #spark= SparkSession.builder.getOrCreate()
 ws=new_run.experiment.workspace 
 #az_dataset = Dataset.get_by_name(ws,"Titanic_selected_columns")
-az_dataset = Dataset.get_by_name(ws,"Titanic_vikas_logging")
+az_dataset = Dataset.get_by_name(ws,"Titanic_vikas_databricks")
 
 df = az_dataset.to_pandas_dataframe()
 df=df[["Pclass","Sex","Age","SibSp","Parch","Fare","Embarked","Survived"]]
@@ -35,8 +35,8 @@ y_prob=rfc.predict_proba(x_test)[:,1]
 from sklearn.metrics import confusion_matrix
 cm=confusion_matrix(y_test,pred)
 score=rfc.score(x_test,y_test)
-model_file='./outputs/models.pkl'
-joblib.dump(value=[train_enc_cols,trained_model],filename=model_file)
+#model_file='./outputs/models.pkl'
+#joblib.dump(value=[train_enc_cols,trained_model],filename=model_file)
 
 new_run.log("Accuracy ",score)
 

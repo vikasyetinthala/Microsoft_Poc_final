@@ -1,0 +1,9 @@
+Environment:
+  databricks:
+    pipyLibraries:
+    - package: scikit-learn
+      repo: ''
+    - package: pandas
+      repo: ''
+    - package: azureml-sdk
+      repo: ''
